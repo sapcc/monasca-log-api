@@ -13,6 +13,7 @@
 # under the License.
 
 import monascastatsd
+import os
 
 from oslo_config import cfg
 from oslo_log import log
@@ -20,8 +21,11 @@ from oslo_log import log
 LOG = log.getLogger(__name__)
 CONF = cfg.CONF
 
-_DEFAULT_HOST = '127.0.0.1'
-_DEFAULT_PORT = 8125
+STATSD_PORT = int(os.getenv('STATSD_PORT', '8125'))
+STATSD_HOST = os.getenv('STATSD_HOST', '127.0.0.1')
+
+_DEFAULT_HOST = STATSD_HOST
+_DEFAULT_PORT = STATSD_PORT
 _DEFAULT_BUFFER_SIZE = 50
 _DEFAULT_DIMENSIONS = {
     'service': 'monitoring',
