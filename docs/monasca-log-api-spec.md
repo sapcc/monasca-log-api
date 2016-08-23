@@ -1,15 +1,14 @@
 # Monasca Log API
 
-Date: April 18, 2016
+Date: May 27, 2016
 
-Document Version: v2.2.1
+Document Version: v2.2.2
 
 # Logs
 The logs resource allows logs to be created.
 
 ## Create Logs
 Create logs.
-
 
 ### POST /v3.0/logs
 
@@ -26,7 +25,7 @@ None.
 #### Request Body
 JSON object which can have a maximum size of 5 MB. It consists of global
 dimensions (optional) and array of logs. Each single log message with 
-resulting Kafka envelope can have a maximum size of 1 MB. 
+resulting envelope can have a maximum size of 1 MB.
 Dimensions is a dictionary of key-value pairs and should be consistent with
 metric dimensions.
 
@@ -104,7 +103,7 @@ are healthy too.
 * 503 - API is running but problems with peripheral components have been spotted.
 
 Example:
-```curl -XGET 192.168.10.4:8080/healthcheck```
+```curl -XGET 192.168.10.4:5607/healthcheck```
 
 ### Peripheral checks
 
@@ -117,7 +116,7 @@ It does not return any data because it is accessible only for ```HEAD``` request
 If the *Monasca Log API* is running the following response code: ```204``` is expected.
 
 Example:
-```curl -XHEAD 192.168.10.4:8080/healthcheck```
+```curl -XHEAD 192.168.10.4:5607/healthcheck```
 
 
 =======
@@ -145,7 +144,7 @@ POST a single line of plain text log.
 
 ```
 POST /v2.0/log/single HTTP/1.1
-Host: 192.168.10.4:8080
+Host: 192.168.10.4:5607
 Content-Type: text/plain
 X-Auth-Token: 27feed73a0ce4138934e30d619b415b0
 X-Application-Type: apache
@@ -160,7 +159,7 @@ POST a multiple lines of plain text log.
 
 ```
 POST /v2.0/log/single HTTP/1.1
-Host: 192.168.10.4:8080
+Host: 192.168.10.4:5607
 Content-Type: text/plain
 X-Auth-Token: 27feed73a0ce4138934e30d619b415b0
 X-Application-Type: apache
@@ -175,7 +174,7 @@ POST a JSON log
 
 ```
 POST /v2.0/log/single HTTP/1.1
-Host: 192.168.10.4:8080
+Host: 192.168.10.4:5607
 Content-Type: application/json
 X-Auth-Token: 27feed73a0ce4138934e30d619b415b0
 X-Application-Type: apache
