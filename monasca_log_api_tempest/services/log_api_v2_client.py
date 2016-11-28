@@ -13,18 +13,15 @@
 # under the License.
 
 from oslo_serialization import jsonutils as json
-from tempest import config
 from tempest.lib.common import rest_client
 
-CONF = config.CONF
 
-
-class LogApiClient(rest_client.RestClient):
+class LogApiV2Client(rest_client.RestClient):
 
     _uri = "/log/single"
 
     def __init__(self, auth_provider, service, region):
-        super(LogApiClient, self).__init__(
+        super(LogApiV2Client, self).__init__(
             auth_provider,
             service,
             region
@@ -45,9 +42,9 @@ class LogApiClient(rest_client.RestClient):
         default_headers.update(headers)
         msg = json.dumps(log)
 
-        resp, body = self.post(LogApiClient._uri, msg, default_headers)
+        resp, body = self.post(LogApiV2Client._uri, msg, default_headers)
 
         return resp, body
 
     def custom_request(self, method, headers=None, body=None):
-        self.request(method=method, url=LogApiClient._uri, headers=headers, body=body)
+        self.request(method=method, url=LogApiV2Client._uri, headers=headers, body=body)

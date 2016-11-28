@@ -92,6 +92,10 @@ function install_monasca_log_api {
     sudo chown mon-log-api:root /etc/monasca/log-api-config.conf
     sudo chmod 0660 /etc/monasca/log-api-config.conf
 
+    sudo cp -f "${PLUGIN_FILES}"/monasca-log-api/log-api-logging.conf /etc/monasca/log-api-logging.conf
+    sudo chown mon-log-api:root /etc/monasca/log-api-logging.conf
+    sudo chmod 0660 /etc/monasca/log-api-logging.conf
+
     if [[ ${SERVICE_HOST} ]]; then
         # set kafka ip address
         sudo sed -i "s/127\.0\.0\.1:9092/${SERVICE_HOST}:9092/g" /etc/monasca/log-api-config.conf
@@ -131,7 +135,7 @@ function install_logstash {
 }
 
 function install_logstash_monasca_output_plugin {
-    local monasca_log_agent_version=0.5
+    local monasca_log_agent_version=0.5.2
     local ls_plugin_filename=logstash-output-monasca_log_api-${monasca_log_agent_version}.gem
     sudo cp -f "${PLUGIN_FILES}"/monasca-log-agent/${ls_plugin_filename} \
         /opt/logstash/${ls_plugin_filename}
@@ -497,6 +501,7 @@ function clean_monasca_log_api {
     sudo rm -f /etc/init/monasca-log-api.conf
     sudo rm -f /etc/monasca/log-api-config.conf
     sudo rm -f /etc/monasca/log-api-config.ini
+    sudo rm -f /etc/monasca/log-api-logging.conf
 
     sudo rm -rf /opt/monasca-log-api
 
