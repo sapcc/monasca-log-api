@@ -1,5 +1,5 @@
 # Copyright 2015 kornicameister@gmail.com
-# Copyright 2016 FUJITSU LIMITED
+# Copyright 2016-2017 FUJITSU LIMITED
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -22,6 +22,8 @@ from oslo_config import cfg
 from oslo_log import log
 import paste.deploy
 
+from monasca_log_api.api.core import request
+from monasca_log_api.reference.common import error_handlers
 from monasca_log_api import uri_map
 
 LOG = log.getLogger(__name__)
@@ -60,11 +62,12 @@ def launch(conf, config_file='/etc/monasca/log-api-config.conf'):
          default_config_files=[config_file])
     log.setup(CONF, 'monasca_log_api')
 
-    app = falcon.API()
+    app = falcon.API(request_type=request.Request)
 
     load_versions_resource(app)
     load_logs_resource(app)
     load_healthcheck_resource(app)
+    error_handlers.register_error_handlers(app)
 
     LOG.debug('Dispatcher drivers have been added to the routes!')
 
@@ -96,15 +99,13 @@ def get_wsgi_app(config_base_path=None):
             os.path.dirname(os.path.realpath(__file__)), '../etc/monasca')
     global_conf = {'config_file': (
         os.path.join(config_base_path, 'log-api-config.conf'))}
-
-    wsgi_app = (
+    return (
         paste.deploy.loadapp(
             'config:log-api-config.ini',
             relative_to=config_base_path,
             global_conf=global_conf
         )
     )
-    return wsgi_app
 
 if __name__ == '__main__':
     wsgi_app = get_wsgi_app()

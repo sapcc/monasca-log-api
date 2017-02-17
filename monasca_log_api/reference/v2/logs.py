@@ -1,5 +1,5 @@
 # Copyright 2015 kornicameister@gmail.com
-# Copyright 2016 FUJITSU LIMITED
+# Copyright 2016-2017 FUJITSU LIMITED
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,11 +14,11 @@
 # under the License.
 
 import falcon
+import six
 
 from monasca_log_api.api import headers
 from monasca_log_api.api import logs_api
 from monasca_log_api.reference.common import log_publisher
-from monasca_log_api.reference.common import validation
 from monasca_log_api.reference.v2.common import service
 from monasca_log_api import uri_map
 
@@ -41,22 +41,14 @@ class Logs(logs_api.LogsApi):
     def on_post(self, req, res):
         with self._logs_processing_time.time(name=None):
             try:
-                validation.validate_payload_size(req)
-                validation.validate_content_type(req,
-                                                 Logs.SUPPORTED_CONTENT_TYPES)
-                validation.validate_cross_tenant(
-                    tenant_id=req.get_header(*headers.X_TENANT_ID),
-                    cross_tenant_id=req.get_param('tenant_id'),
-                    roles=req.get_header(*headers.X_ROLES)
-                )
-
-                cross_tenant_id = req.get_param('tenant_id')
-                tenant_id = req.get_header(*headers.X_TENANT_ID)
+                req.validate(self.SUPPORTED_CONTENT_TYPES)
+                tenant_id = (req.project_id if req.project_id
+                             else req.cross_project_id)
 
                 log = self.get_log(request=req)
                 envelope = self.get_envelope(
                     log=log,
-                    tenant_id=tenant_id if tenant_id else cross_tenant_id
+                    tenant_id=tenant_id
                 )
 
                 self._logs_size_gauge.send(name=None,
@@ -95,6 +87,8 @@ class Logs(logs_api.LogsApi):
 
 
 def _get_v3_link(req):
-    self_uri = req.uri.decode('UTF-8')
+    self_uri = req.uri
+    if six.PY2:
+        self_uri = self_uri.decode('UTF-8')
     base_uri = self_uri.replace(req.relative_uri, '')
     return '%s%s' % (base_uri, uri_map.V3_LOGS_URI)
