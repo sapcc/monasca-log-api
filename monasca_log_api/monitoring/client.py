@@ -92,14 +92,9 @@ def get_client(dimensions=None):
                 LOG.warning('Cannot override fixed dimension %s=%s', key,
                             _DEFAULT_DIMENSIONS[key])
 
-    connection = monascastatsd.Connection(
-        host=CONF.monitoring.statsd_host,
-        port=CONF.monitoring.statsd_port,
-        max_buffer_size=CONF.monitoring.statsd_buffer
-    )
-    client = monascastatsd.Client(name=_CLIENT_NAME,
-                                  connection=connection,
-                                  dimensions=dims)
+    client = monascastatsd.Client(name=_CLIENT_NAME, host=CONF.monitoring.statsd_host,
+                                  port=CONF.monitoring.statsd_port, auto_buffer=True,
+                                  max_buffer_size=CONF.monitoring.statsd_buffer, dimensions=dims)
 
     LOG.debug('Created statsd client %s[%s] = %s:%d', _CLIENT_NAME, dims,
               CONF.monitoring.statsd_host, CONF.monitoring.statsd_port)
